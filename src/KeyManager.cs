@@ -1,0 +1,163 @@
+using System;
+using System.Collections;
+using System;
+
+using OpenDatabase;
+
+using SharpSession.Cryptography;
+
+
+namespace SharpSession
+{
+    /// <summary>
+    /// Routines for creating and managing API keys.
+    /// </summary>
+    public class APIKeyManager
+    {
+        public Database KeyDBInstance; // Database instance where the keys will be stored.
+
+        protected Stack<APIKey> APIKeyStack; // Temporary stack of APIKeys//
+
+        protected APIKey[] APIKeyArray; // Temporary array of APIKeys
+
+        public string APIKeyTable; // Default API key table
+
+        public static TimeDifference DefaultKeyTimeDifference = new TimeDifference();
+
+        public bool AutoBackup;
+
+        public bool KeyExists(APIKey key)
+        {
+
+
+            return true;
+        }
+
+        public void BackupKeys()
+        {
+            APIKey[] keyArray = null;
+
+            int size;
+
+            try
+            {
+                if (this.KeyDBInstance == null)
+                    throw new Exception("No database instance was provided to back up the keys in.");
+
+                keyArray = this.APIKeyStack.ToArray();
+
+                size = keyArray.Length;
+
+                for (int x = 0; x < size; x++)
+                    this.KeyDBInstance.InsertRecord(keyArray[x].GetRecord(), this.APIKeyTable);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        public void LoadKeys()
+        {
+            Record[] keys = null;
+
+            int size = 0;
+            
+            if (this.KeyDBInstance == null)
+            {
+                this.APIKeyStack = new Stack<APIKey>();
+
+                return;
+            }
+
+            try
+            {
+                keys = this.KeyDBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};");
+
+                for (int x = 0; x < size; x++)
+                    this.APIKeyStack.Push(new APIKey(keys[x]));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        public int GetAPIKeyCount()
+        {
+            int size;
+
+            if (this.KeyDBInstance == null)
+                return this.APIKeyStack.Count;
+
+            try
+            {
+                size = this.KeyDBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};").Length;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return size;
+        }
+
+        public APIKey IssueAPIKey(string userID)
+        {
+            APIKey key = null;
+
+            try
+            {
+                key = new APIKey(Hashing.GetSHA256(), userID, new KeyValidityTime());
+                this.APIKeyStack.Push(key);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return key; // new APIKey(userID, null, new KeyValidityTime());
+        }
+
+        public APIKey IssueAPIKey(string userID, KeyValidityTime validityTime)
+        {
+            APIKey key = null;
+
+            try
+            {
+                key = new APIKey(userID, null, validityTime);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return key;
+        }
+
+        public APIKeyManager(bool load = false, string keyTable = "APIKeys", bool autoBackup = false)
+        {
+            this.KeyDBInstance = null;
+            this.AutoBackup = false;
+            this.APIKeyTable = "APIKeys";
+
+            if (load)
+                this.LoadKeys();
+        }
+
+        public APIKeyManager(Database keyDBInstance, bool load = false, bool autoBackup = false)
+        {
+            this.KeyDBInstance = keyDBInstance;
+            this.AutoBackup = autoBackup;
+            this.APIKeyTable = "APIKeys";
+
+            this.LoadKeys();
+        }
+
+        ~APIKeyManager()
+        {
+            if (this.AutoBackup)
+                this.BackupKeys();
+        }
+    }
+}
