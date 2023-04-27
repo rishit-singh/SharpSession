@@ -1,163 +1,81 @@
-using System;
-using System.Collections;
-using System;
+    using System;
+    using System.Collections;
+    using System;
 
-using OpenDatabase;
+    using OpenDatabase;
+    using OpenDatabaseAPI;
+    using SharpSession.Cryptography;
 
-using SharpSession.Cryptography;
 
-
-namespace SharpSession
-{
-    /// <summary>
-    /// Routines for creating and managing API keys.
-    /// </summary>
-    public class APIKeyManager
+    namespace SharpSession
     {
-        public Database KeyDBInstance; // Database instance where the keys will be stored.
-
-        protected Stack<APIKey> APIKeyStack; // Temporary stack of APIKeys//
-
-        protected APIKey[] APIKeyArray; // Temporary array of APIKeys
-
-        public string APIKeyTable; // Default API key table
-
-        public static TimeDifference DefaultKeyTimeDifference = new TimeDifference();
-
-        public bool AutoBackup;
-
-        public bool KeyExists(APIKey key)
+        /// <summary>
+        /// Routines for creating and managing API keys.
+        /// </summary>
+        public class APIKeyManager
         {
+            public PostGRESDatabase DBInstance; // Database instance where the keys will be stored.
 
+            public Dictionary<string, APIKey> APIKeyMap;
 
-            return true;
-        }
+            public string APIKeyTable; // Default API key table
 
-        public void BackupKeys()
-        {
-            APIKey[] keyArray = null;
+            public static TimeDifference DefaultKeyTimeDifference = new TimeDifference();
 
-            int size;
+            public bool AutoBackup;
 
-            try
+            public bool KeyExists(APIKey key)
             {
-                if (this.KeyDBInstance == null)
-                    throw new Exception("No database instance was provided to back up the keys in.");
-
-                keyArray = this.APIKeyStack.ToArray();
-
-                size = keyArray.Length;
-
-                for (int x = 0; x < size; x++)
-                    this.KeyDBInstance.InsertRecord(keyArray[x].GetRecord(), this.APIKeyTable);
+                return this.APIKeyMap.ContainsKey(key.Key);
             }
-            catch (Exception e)
+
+            public void BackupKeys()
             {
-                Console.WriteLine(e.Message);
             }
-        }
-
-        public void LoadKeys()
-        {
-            Record[] keys = null;
-
-            int size = 0;
             
-            if (this.KeyDBInstance == null)
+            public void LoadKeys()
             {
-                this.APIKeyStack = new Stack<APIKey>();
+                Record[] keyRecords = this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};", this.APIKeyTable);
 
-                return;
+                APIKey temp;
+                
+                for (int x = 0; x < keyRecords.Length; x++)
+                    this.APIKeyMap.Add((temp = new APIKey(keyRecords[x])).Key, temp);
             }
 
-            try
+            public int GetAPIKeyCount()
             {
-                keys = this.KeyDBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};");
-
-                for (int x = 0; x < size; x++)
-                    this.APIKeyStack.Push(new APIKey(keys[x]));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        public int GetAPIKeyCount()
-        {
-            int size;
-
-            if (this.KeyDBInstance == null)
-                return this.APIKeyStack.Count;
-
-            try
-            {
-                size = this.KeyDBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};").Length;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+                return this.APIKeyMap.Count;
             }
 
-            return size;
-        }
-
-        public APIKey IssueAPIKey(string userID)
-        {
-            APIKey key = null;
-
-            try
+            public APIKey IssueAPIKey(string userID)
             {
-                key = new APIKey(Hashing.GetSHA256(), userID, new KeyValidityTime());
-                this.APIKeyStack.Push(key);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+                return new APIKey();
             }
 
-            return key; // new APIKey(userID, null, new KeyValidityTime());
-        }
-
-        public APIKey IssueAPIKey(string userID, KeyValidityTime validityTime)
-        {
-            APIKey key = null;
-
-            try
+            public APIKey IssueAPIKey(string userID, KeyValidityTime validityTime)
             {
-                key = new APIKey(userID, null, validityTime);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+                return new APIKey();
             }
 
-            return key;
-        }
+            public void UpdateKeys()
+            {
+            }
 
-        public APIKeyManager(bool load = false, string keyTable = "APIKeys", bool autoBackup = false)
-        {
-            this.KeyDBInstance = null;
-            this.AutoBackup = false;
-            this.APIKeyTable = "APIKeys";
+            public APIKeyManager(PostGRESDatabase dbInstance, bool load = false, bool autoBackup = false)
+            {
+                this.DBInstance = dbInstance;
+                this. 
+                    AutoBackup = autoBackup;
+                this.APIKeyTable = "APIKeys";
 
-            if (load)
                 this.LoadKeys();
-        }
+            }
 
-        public APIKeyManager(Database keyDBInstance, bool load = false, bool autoBackup = false)
-        {
-            this.KeyDBInstance = keyDBInstance;
-            this.AutoBackup = autoBackup;
-            this.APIKeyTable = "APIKeys";
-
-            this.LoadKeys();
-        }
-
-        ~APIKeyManager()
-        {
-            if (this.AutoBackup)
-                this.BackupKeys();
-        }
+            ~APIKeyManager()
+            {
+                if (this.AutoBackup)
+                    this.BackupKeys();
+            }
+        } 
     }
-}

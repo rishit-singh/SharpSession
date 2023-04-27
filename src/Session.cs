@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using OpenDatabase;
-
+using OpenDatabaseAPI;
 using SharpSession.Tools;
 
 namespace SharpSession
@@ -12,7 +13,11 @@ namespace SharpSession
         LoggedIn
     }
 
-    public class Session
+    
+    /// <summary>
+    /// Contains info about a session.
+    /// </summary>
+    public class Session 
     {
         public string ID;
 
@@ -20,12 +25,7 @@ namespace SharpSession
 
         public string UserID;
 
-        public SessionStatus Status;
-
-        public static string[] StatusStrings = new string[] {
-            "LoggedOut",
-            "LoggedIn"
-        };
+        public SessionStatus Status { get { return this.Status; } set { this.SetStatus(value); } }
 
         public Record GetRecord()
         {
@@ -39,7 +39,7 @@ namespace SharpSession
                     this.ID,
                     this.SessionAPIKey.Key,
                     this.UserID,
-                    Session.StatusStrings[(int)this.Status]
+                    this.Status.ToString()
                 });
         }
 
@@ -50,18 +50,15 @@ namespace SharpSession
             this.Status = (SessionStatus)GeneralTools.Clip(ref statusInt, (int)SessionStatus.LoggedOut, (int)SessionStatus.LoggedIn);
         }
 
-        public bool Start()
+        public virtual bool Start()
         {
-            if (this.Status != SessionStatus.LoggedIn)
-                this.Status = SessionStatus.LoggedIn;
-
-
-
+            this.Status = SessionStatus.LoggedIn;
             return true;
         }
 
-        public bool Stop()
+        public virtual bool Stop()
         {
+            this.Status  = SessionStatus.LoggedOut;
             return true;
         }
 
@@ -77,6 +74,33 @@ namespace SharpSession
             this.ID = id;
             this.SessionAPIKey = apiKey;
             this.Status = status;
+        }
+    }
+
+
+    public class SessionManager
+    {
+        public Dictionary<string, Session> SessionMap;
+
+        public PostGRESDatabase SessionDB;
+        
+        public void AddSession(Session session)
+        {
+            this.SessionMap.Add(session.ID, session);
+        }
+
+        public Session GetSessionByID(string id)
+        {
+            if (this.SessionMap.ContainsKey(id))
+                return this.SessionMap[id];
+
+            return null;
+        }
+
+        public SessionManager(DatabaseConfiguration databaseConfiguration)
+        {
+            this.SessionMap = new Dictionary<string, Session>();
+            this.SessionDB = new PostGRESDatabase(databaseConfiguration);
         }
     }
 }

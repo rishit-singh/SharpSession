@@ -1,0 +1,37 @@
+﻿<Properties StartupConfiguration="{02D6FF7D-8185-40D7-88E4-C3335FA619E0}|Default">
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.SharpSession PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/Tools.cs">
+    <Files>
+      <File FileName="src/Cryptography.cs" Line="87" Column="5" />
+      <File FileName="src/Session.cs" Line="40" Column="44" />
+      <File FileName="src/IRecord.cs" Line="12" Column="1" />
+      <File FileName="Program.cs" Line="14" Column="1" />
+      <File FileName="src/Tools.cs" Line="150" Column="47" />
+      <File FileName="src/KeyManager.cs" Line="130" Column="61" NotebookId="1" />
+      <File FileName="src/KeyValidityTime.cs" Line="123" Column="32" NotebookId="1" />
+      <File FileName="src/APIKey.cs" Line="33" Column="31" NotebookId="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="SharpSession" expanded="True">
+            <Node name="SharpSession" expanded="True">
+              <Node name="Dependencies" expanded="True" />
+              <Node name="dependencies" expanded="True" />
+              <Node name="src" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+</Properties>

@@ -1,62 +1,156 @@
-/// Author: https://github.com/rishit-singh/CryptographyHelperLib
-/// This code is licensed under MIT license.
-
-///Copyright (c) 2022 Rishit Singh
-
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-
-/// The above copyright notice and this permission notice shall be included in all
-/// copies or substantial portions of the Software.
-
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
-
 using System;
 using System.Text;
 using System.Security.Cryptography;
+using SharpSession.Tools;
 
 namespace SharpSession.Cryptography
 {
-    /// <summary>
-    /// Contains string hashing functions.
-    /// </summary>
-    public class Hashing
-    {
-        protected static string ConvertBytesToString(Byte[] bytes)
-        {
-            int byteSize = bytes.Length;
+	public enum ByteEncoding
+	{
+		UTF8,
+		UTF7
+	}
 
-            string hashString = null;
+	public delegate string HashFunction(string val, ByteEncoding encoding); // Stores a hash function.
+	
+	/// <summary>
+	/// Contains string hashing functions. 
+	/// </summary>
+	public class Hashing
+	{
+		public enum HashFunctionType
+		{
+			Sha256
+		}
+			
+		protected static HashFunction[] HashFunctions = new HashFunction[] {
+			Hashing.GetSHA256
+		};
 
-            for (int x = 0; x < byteSize; x++)
-                hashString += bytes[x].ToString("x2");
+		protected static Encoding[] Encoders = new Encoding[] {
+			Encoding.UTF8,
+			Encoding.UTF7
+		}; 
 
-            return hashString;
-        }
+		/// <summary>
+		/// Hashes the provided string with SHA256.
+		/// </summary>
+		/// <param name="str">String to be hashed.</param>
+		/// <param name="encoding"> Encoding to be used. </param>
+		/// <returns>Hashed string. </returns>
+		public static string GetSHA256(string str, ByteEncoding encoding)
+		{
+			Encoding encoder = null;
 
-        public static string GetSHA256(string str)
-        {
-            try
-            {
-                if (str == null)
-                    throw new NullReferenceException();
-            }
-            catch (NullReferenceException)
-            {
-                return str;
-            }
+			try
+			{
+				if (str == null)
+					throw new NullReferenceException();
+				
+				if (!GeneralTools.InRange((int)encoding, 0, Hashing.Encoders.Length))
+					throw new Exception("Invalid encoding");
+							
+				encoder = Hashing.Encoders[(int)encoding];
+			}
+			catch (Exception e)
+			{	
+				#if DEBUG
+					Console.WriteLine(e.Message);
+				#endif
 
-            return Hashing.ConvertBytesToString(SHA256Managed.Create().ComputeHash(Encoding.UTF8.GetBytes(str)));
-        }
-    }
-}
+				return str;
+			}
+
+			return GeneralTools.ConvertBytesToString(SHA256Managed.Create().ComputeHash(encoder.GetBytes(str)));
+		}
+		
+
+		/// <summary>
+		/// Hashes= the provided string.
+		/// </summary>
+		/// <param name="str"> String to be hashed. </param>
+		/// <param name="encoding">Encoding type to be used.</param>
+		/// <param name="functionType">Hash function to be used.</param>
+		/// <returns> Hashed string. </returns>
+		public static string GetHash(string str, ByteEncoding encoding = ByteEncoding.UTF8, Hashing.HashFunctionType functionType = Hashing.HashFunctionType.Sha256)
+		{
+			int type;
+
+			string hashedString = null;
+
+			try
+			{
+				if (!GeneralTools.InRange(type = (int)functionType, 0, Hashing.HashFunctions.Length))
+					throw new Exception("Invalid hash function");
+
+				hashedString = Hashing.HashFunctions[type](str, encoding);
+			}
+			catch (Exception e)
+			{
+				#if DEBUG
+					Console.WriteLine(e.Message);
+				#endif
+			}
+
+			return hashedString;
+		}
+
+		/// <summary>
+		/// Hashes the provided string.
+		/// </summary>
+		/// <param name="str"> String to be hashed. </param>
+		/// <param name="encoding">Encoding type to be used.</param>
+		/// <returns> Hashed string. </returns>
+		public static string GetHash(string str, ByteEncoding encoding = ByteEncoding.UTF8)
+		{
+			int type;
+
+			string hashedString = null;
+
+			try
+			{
+				if (!GeneralTools.InRange(type = (int)HashFunctionType.Sha256, 0, Hashing.HashFunctions.Length))
+					throw new Exception("Invalid hash function");
+
+				hashedString = Hashing.HashFunctions[type](str, encoding);
+			}
+			catch (Exception e)
+			{
+				#if DEBUG
+					Console.WriteLine(e.Message);
+				#endif
+			}
+
+			return hashedString;
+		}
+
+		/// <summary>
+		/// Hashes the provided string.
+		/// </summary>
+		/// <param name="str"> String to be hashed. </param>
+		/// <param name="functionType">Hash function to be used.</param>
+		/// <returns> Hashed string. </returns>
+		public static string GetHash(string str, Hashing.HashFunctionType functionType = Hashing.HashFunctionType.Sha256)
+		{
+			int type;
+
+			string hashedString = null;
+			
+			try
+			{
+				if (!GeneralTools.InRange(type = (int)functionType, 0, Hashing.HashFunctions.Length))
+					throw new Exception("Invalid hash function");
+					
+				hashedString = Hashing.HashFunctions[type](str, ByteEncoding.UTF8);
+			}
+			catch (Exception e)
+			{
+				#if DEBUG
+					Console.WriteLine(e.Message);
+				#endif
+			}
+ 
+			return hashedString;
+		}
+	}
+} 

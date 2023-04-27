@@ -4,11 +4,17 @@ namespace SharpSession
 {
     public class Program
     {
+        public static void PrintKeys(APIKey[] keys)
+        {
+            int size = keys.Length;
+
+            for (int x = 0; x < size; x++)
+                Console.WriteLine(keys[x].Key);
+        }
+
+
         public static void Main()
         {
-            TimeDifference td = new TimeDifference(new int[] { 2, 3, 43 });
-			
-            Tools.GeneralTools.PrintArray<int>(td.TimeDifferenceArray);
         }
     }
 }
