@@ -5,7 +5,7 @@ namespace SharpSession
 {
     public interface IRecord
     {
-        Record GetRecord();        
+        Record ToRecord();        
     }
 }
 

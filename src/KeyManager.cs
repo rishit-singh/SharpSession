@@ -24,13 +24,25 @@
 
             public bool AutoBackup;
 
-            public bool KeyExists(APIKey key)
+            public bool KeyExists(APIKey key, bool dbCheck = false)
             {
-                return this.APIKeyMap.ContainsKey(key.Key);
+                if (!dbCheck)
+                    return this.APIKeyMap.ContainsKey(key.Key);
+
+                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable}", this.APIKeyTable).Length != 0);
             }
+
 
             public void BackupKeys()
             {
+                Dictionary<string, APIKey>.ValueCollection keys = this.APIKeyMap.Values;
+
+                foreach (APIKey key in keys)
+                    if (this.KeyExists(key, true))
+                        this.DBInstance.UpdateRecord(new Record(new string[] { "Key" }, new object[] { key.Key }),
+                            key.ToRecord(), this.APIKeyTable);
+                    else
+                        this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
             }
             
             public void LoadKeys()
@@ -48,25 +60,35 @@
                 return this.APIKeyMap.Count;
             }
 
-            public APIKey IssueAPIKey(string userID)
+            public APIKey IssueAPIKey(string userID, Dictionary<string, bool> permissionsMap, bool backUp = true)
             {
-                return new APIKey();
+                
+                APIKey key = new APIKey(Guid.NewGuid().ToString(), userID, permissionsMap, true);
+                
+                this.APIKeyMap.Add(key.Key, key);
+
+                if (backUp)
+                    this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+
+                return key;
             }
 
-            public APIKey IssueAPIKey(string userID, KeyValidityTime validityTime)
+            public APIKey IssueAPIKey(string userID, Dictionary<string, bool> permissionsMap, KeyValidityTime validityTime, bool backUp = true)
             {
-                return new APIKey();
-            }
+                APIKey key = new APIKey(Guid.NewGuid().ToString(), userID, permissionsMap, validityTime);
+                
+                this.APIKeyMap.Add(key.Key, key);
 
-            public void UpdateKeys()
-            {
+                if (backUp)
+                    this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+
+                return key;
             }
 
             public APIKeyManager(PostGRESDatabase dbInstance, bool load = false, bool autoBackup = false)
             {
                 this.DBInstance = dbInstance;
-                this. 
-                    AutoBackup = autoBackup;
+                this.AutoBackup = autoBackup;
                 this.APIKeyTable = "APIKeys";
 
                 this.LoadKeys();

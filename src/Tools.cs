@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Npgsql;
 
 namespace SharpSession.Tools
 {
@@ -192,7 +193,32 @@ namespace SharpSession.Tools
             return -1;
         }
 
+        public static string GetPermissionsString(Dictionary<string, bool> permissionsMap)
+        {
+            string permissionsString = null;
 
+            string[] keys = permissionsMap.Keys.ToArray();
+
+            bool[] values = permissionsMap.Values.ToArray();
+
+            for (int x = 0; x < keys.Length; x++)
+                permissionsString += $"{keys[x]}={values[x]};";
+
+            return permissionsString;
+        }
+
+        public static Dictionary<string, bool> GetPermissionsMap(string permissionsString)
+        {
+            Dictionary<string, bool> permissionsMap = new Dictionary<string, bool>();
+
+            string[] split = permissionsString.Split(';'), split1;
+
+            for (int x = 0; x < split.Length; x++)
+                permissionsMap.Add((split1 = split[x].Split('='))[0], split[1] == "true");
+            
+            return permissionsMap;
+        } 
+        
         public static int Search(APIKey val, APIKey[] array)
         {
             KeyTools.Sort(ref array);
