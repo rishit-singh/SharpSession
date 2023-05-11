@@ -1,10 +1,12 @@
     using System;
     using System.Collections;
     using System;
-
+    using System.Runtime.CompilerServices;
+    using Newtonsoft.Json;
     using OpenDatabase;
     using OpenDatabaseAPI;
     using SharpSession.Cryptography;
+    using SharpSession.Tools;
 
 
     namespace SharpSession
@@ -24,12 +26,26 @@
 
             public bool AutoBackup;
 
+
+            public static Table GetTableSchema(string tableName)
+            {
+                return new Table(tableName,
+                    new Field[] {
+                         new Field("UserID", FieldType.Char, new Flag[] { Flag.PrimaryKey, Flag.NotNull }, 64),
+                         new Field("Key", FieldType.Char, new Flag[] { Flag.NotNull }, 88),
+                         new Field("Permissions", FieldType.VarChar, new Flag[]{}, 1024),
+                         new Field("CreationTime", FieldType.VarChar, new Flag[] { Flag.NotNull}, 22),
+                         new Field("ExpiryTime", FieldType.VarChar, new Flag[]{}, 22),
+                         new Field("IsLimitless", FieldType.Bool, new Flag[] { Flag.NotNull })
+                    }); 
+            }
+            
             public bool KeyExists(APIKey key, bool dbCheck = false)
             {
                 if (!dbCheck)
                     return this.APIKeyMap.ContainsKey(key.Key);
 
-                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable}", this.APIKeyTable).Length != 0);
+                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key.Key}\'", this.APIKeyTable).Length != 0);
             }
 
 
@@ -60,15 +76,23 @@
                 return this.APIKeyMap.Count;
             }
 
+            protected bool KeyTableExists()
+            {
+                return ((int)this.DBInstance.FetchQueryData("SELECT * FROM information_schema.tables WHERE table_name=\'apikeys\'", this.APIKeyTable).Length != 0);
+            }
+
             public APIKey IssueAPIKey(string userID, Dictionary<string, bool> permissionsMap, bool backUp = true)
             {
-                
-                APIKey key = new APIKey(Guid.NewGuid().ToString(), userID, permissionsMap, true);
+                APIKey key = new APIKey(GeneralTools.GetRandomBase64(64), userID, permissionsMap, true);
                 
                 this.APIKeyMap.Add(key.Key, key);
 
                 if (backUp)
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(key.ToRecord()));
                     this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+                }
+                
 
                 return key;
             }
@@ -85,19 +109,26 @@
                 return key;
             }
 
-            public APIKeyManager(PostGRESDatabase dbInstance, bool load = false, bool autoBackup = false)
+            public APIKeyManager(PostGRESDatabase dbInstance, string tableName = "APIKeys", bool load = false, bool autoBackup = false)
             {
                 this.DBInstance = dbInstance;
                 this.AutoBackup = autoBackup;
-                this.APIKeyTable = "APIKeys";
+                this.APIKeyTable = tableName;
+                
+                this.APIKeyMap = new Dictionary<string, APIKey>();
 
-                this.LoadKeys();
+                if (!this.KeyTableExists())
+                    this.DBInstance.ExecuteQuery(APIKeyManager.GetTableSchema("APIKeys").GetCreateQuery());
+                
+                if (load) 
+                    this.LoadKeys();
             }
+       
 
             ~APIKeyManager()
             {
                 if (this.AutoBackup)
                     this.BackupKeys();
             }
-        } 
+        }
     }

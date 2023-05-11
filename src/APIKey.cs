@@ -11,7 +11,7 @@ namespace SharpSession
     /// <summary>
     /// Stores an API key with related methods.
     /// </summary>
-    public class APIKey : IRecord, IComparable<APIKey>
+    public class APIKey : IRecord
     {
         public string Key;
 
@@ -32,18 +32,18 @@ namespace SharpSession
             try
             {
                 record = new Record(new string[] {
-                        "Key",
                         "UserID",
+                        "Key",
                         "Permissions",
                         "CreationTime",
                         "ExpiryTime",
                         "IsLimitless"
                     }, new object[] {
-                        this.Key,
                         this.UserID,
+                        this.Key,
                         Tools.KeyTools.GetPermissionsString(this.Permissions),
                         this.ValidityTime.CreationTime.ToString(),
-                        this.ValidityTime.ExpiryTime.ToString(),
+                        (!this.IsLimitless) ? this.ValidityTime.ExpiryTime.ToString() : null,
                         this.IsLimitless
                     });
             }
@@ -53,11 +53,6 @@ namespace SharpSession
             }
 
             return record;
-        }
-
-        public bool Refresh()
-        {
-            return true;
         }
 
         public bool GetIsExpired()
@@ -75,11 +70,6 @@ namespace SharpSession
                 this.UserID != null &&
                 this.ValidityTime.IsExpired != true
             );
-        }
-
-        public int CompareTo(APIKey? key)
-        {
-            return this.Key.CompareTo(key?.Key);
         }
 
         public APIKey()
@@ -103,6 +93,8 @@ namespace SharpSession
             this.IsLimitless = isLimitless;
        
             this.Permissions = permissions;
+
+            this.ValidityTime = new KeyValidityTime(DateTime.Now, new DateTime());
         }
         
         public APIKey(string key, string userID, KeyValidityTime validityTime)
@@ -125,7 +117,7 @@ namespace SharpSession
         {
             this.Key = key;
             this.UserID = userID;
-            this.ValidityTime = new KeyValidityTime(creationTime, validityTime);
+            this.ValidityTime = new KeyValidityTime(creationTime.ToUniversalTime(), validityTime);
             this.IsLimitless = false;
         }
 
@@ -133,7 +125,7 @@ namespace SharpSession
         {
             this.Key = key;
             this.UserID = userID;
-            this.ValidityTime = new KeyValidityTime(creationTime, validityTime);
+            this.ValidityTime = new KeyValidityTime(creationTime.ToUniversalTime(), validityTime);
             this.IsLimitless = false;
             this.Permissions = permissions;
         }
@@ -146,7 +138,6 @@ namespace SharpSession
             this.ValidityTime = new KeyValidityTime(DateTime.Parse((string)record.Values[3]), DateTime.Parse((string)record.Values[4]));
             this.IsLimitless = (bool)record.Values[5];
         }
-
   
     }
 }

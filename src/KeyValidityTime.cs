@@ -26,7 +26,7 @@
                 for (int x = 0; x < size; x++)
                     if (timeDifference.TimeDifferenceArray[x] > timeDifference1.TimeDifferenceArray[x])
                         return 1;
-                    else if (timeDifference.TimeDifferenceArray[x] > timeDifference1.TimeDifferenceArray[x])
+                    else if (timeDifference.TimeDifferenceArray[x] < timeDifference1.TimeDifferenceArray[x])
                         return -1;
 
                 return 0;
@@ -114,12 +114,13 @@
             public void SetTimeDifference(TimeDifference timeDifference)
             {
                 this.Difference = timeDifference;
-                
-                this.ExpiryTime.AddMonths(this.Difference.Months);
-                this.ExpiryTime.AddDays(this.Difference.Days);
-                this.ExpiryTime.AddHours(this.Difference.Hours);
-                this.ExpiryTime.AddMinutes(this.Difference.Minutes);
-                this.ExpiryTime.AddSeconds(this.Difference.Seconds);
+
+                this.ExpiryTime = this.ExpiryTime.AddYears(timeDifference.Years);
+                this.ExpiryTime = this.ExpiryTime.AddMonths(this.Difference.Months);
+                this.ExpiryTime = this.ExpiryTime.AddDays(this.Difference.Days);
+                this.ExpiryTime = this.ExpiryTime.AddHours(this.Difference.Hours);
+                this.ExpiryTime = this.ExpiryTime.AddMinutes(this.Difference.Minutes);
+                this.ExpiryTime = this.ExpiryTime.AddSeconds(this.Difference.Seconds);
             }
 
             public bool GetIsExpired()
@@ -133,8 +134,13 @@
 
                 if ((comp = GeneralTools.DateTimeCmp(this.CreationTime, this.ExpiryTime)) >= 0)
                     this.ExpiryTime = this.CreationTime;
-
+                
                 this.SetTimeDifference(new TimeDifference());
+            }
+
+            public KeyValidityTime ToLocalTime()
+            {
+                return new KeyValidityTime(this.CreationTime.ToLocalTime(), this.ExpiryTime.ToLocalTime());
             }
 
             public KeyValidityTime(DateTime creationTime, DateTime expiryTime)

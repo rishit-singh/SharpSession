@@ -1,6 +1,8 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Npgsql;
 
 namespace SharpSession.Tools
@@ -97,102 +99,23 @@ namespace SharpSession.Tools
 
             return str;
         }
+
+        public static string GetRandomBase64(int size)
+        {
+            byte[] bytes = new byte[size];
+
+            using (RandomNumberGenerator generator = RandomNumberGenerator.Create())
+            {
+                generator.GetBytes(bytes);
+                return Convert.ToBase64String(bytes);
+            }
+
+            return null; 
+        }
     }
 
-    public enum SortingAlgorithm
-    {
-        BubbleSort,
-        QuickSort
-    }
-
-    public delegate void SortFunction<T>(ref T[] array);
-    
     public class KeyTools
     {
-        protected static SortFunction<APIKey>[] SortFunctions = new Tools.SortFunction<APIKey>[] {
-            KeyTools.BubbleSort,
-            KeyTools.QuickSortWrapper
-        };
-
-        protected static int Partition(ref APIKey[] keys, int start, int end)
-        {
-            APIKey pivot = keys[end];
-
-            int i = start - 1;
-
-            for (int x = start; x < end; x++)
-                if (keys[x].CompareTo(pivot) >= 0)
-                    GeneralTools.Swap<APIKey>(ref keys[i++], ref keys[x]);
-
-            GeneralTools.Swap<APIKey>(ref keys[++i], ref keys[end]);
-            
-
-            return i;
-        }
-
-        protected static void QuickSort(ref APIKey[] keys, int start, int end)
-        {
-            int q;
-
-            if (start < end)
-            {
-                q = KeyTools.Partition(ref keys, start, end);
-
-                QuickSort(ref keys, start, q - 1);
-                QuickSort(ref keys, q + 1, end);
-            }
-        }
-
-        public static void BubbleSort(ref APIKey[] keys)
-        {
-            int size = keys.Length;
-
-            for (int y = 0; y < size - 1; y++)
-                for (int x = 0; x < size - y - 1; x++)
-                    if (keys[x].CompareTo(keys[x + 1]) < 0)
-                        GeneralTools.Swap<APIKey>(ref keys[x], ref keys[x + 1]); 
-        }
-
-        protected static void QuickSortWrapper(ref APIKey[] keys)
-        {
-            KeyTools.QuickSort(ref keys, 0, keys.Length - 1);
-        }
-
-        /// <summary>
-        /// Sorts the provided APIKey array.
-        /// </summary>  
-        /// <param name="keys"></param>
-        public static void Sort(ref APIKey[] keys, SortingAlgorithm sortingAlgorithm = SortingAlgorithm.QuickSort)
-        {
-            try
-            {
-                KeyTools.SortFunctions[GeneralTools.Clip((long)sortingAlgorithm, 0, (long)SortingAlgorithm.QuickSort)](ref keys);    
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
-        public static int BinarySearch(APIKey val, APIKey[] keys, int start, int end)
-        {
-            int mid = (start + end) / 2;
-
-            if (start < end)
-            {
-                if (keys[mid].Key.CompareTo(val.Key) == 0)
-                    return mid;
-
-                else if (keys[mid].Key.CompareTo(val.Key) > 0)
-                    return KeyTools.BinarySearch(val, keys, 0, mid);
-
-                else if (keys[mid].Key.CompareTo(val.Key) < 0)
-                    return KeyTools.BinarySearch(val, keys, mid + 1, end);
-            }
-
-            return -1;
-        }
-
         public static string GetPermissionsString(Dictionary<string, bool> permissionsMap)
         {
             string permissionsString = null;
@@ -218,12 +141,6 @@ namespace SharpSession.Tools
             
             return permissionsMap;
         } 
-        
-        public static int Search(APIKey val, APIKey[] array)
-        {
-            KeyTools.Sort(ref array);
-
-            return KeyTools.BinarySearch(val, array, 0, array.Length);
-        }
     }
 }
+

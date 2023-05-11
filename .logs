@@ -1,0 +1,86 @@
+Connection is not open
+Connection is not open
+Connection is not open
+Connection is not open
+Connection is not open
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Can't cast database type bigint to String
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Can't cast database type bigint to String
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Column 'self_referencing_column_name' is null.
+42P07: relation "apikeys" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+22001: value too long for type character(64)
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+22001: value too long for type character(64)
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+23502: null value in column "creationtime" of relation "apikeys" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
