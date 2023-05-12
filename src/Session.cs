@@ -5,6 +5,7 @@ using OpenDatabase;
 using OpenDatabaseAPI;
 using SharpSession.Tools;
 
+
 namespace SharpSession
 {
     public enum SessionStatus
@@ -17,17 +18,17 @@ namespace SharpSession
     /// <summary>
     /// Contains info about a session.
     /// </summary>
-    public class Session 
+    public class Session : IRecord 
     {
         public string ID;
 
-        public APIKey SessionAPIKey;
-
         public string UserID;
+
+        public APIKey SessionAPIKey;
 
         public SessionStatus Status { get { return this.Status; } set { this.SetStatus(value); } }
 
-        public Record GetRecord()
+        public Record ToRecord()
         {
             return new Record(new string[] {
                     "ID",
@@ -77,14 +78,15 @@ namespace SharpSession
         }
     }
 
-
     public class SessionManager
     {
         public Dictionary<string, Session> SessionMap;
 
         public PostGRESDatabase SessionDB;
+
+        public APIKeyManager KeyManager; 
         
-        public void AddSession(Session session)
+        public void AddSession(Session session, bool updateDB = true)
         {
             this.SessionMap.Add(session.ID, session);
         }

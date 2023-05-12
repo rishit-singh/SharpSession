@@ -33,7 +33,9 @@ namespace SharpSession
             
             permissionsMap.Add("Read", true);
             
-            manager.IssueAPIKey(Guid.NewGuid().ToString(), permissionsMap, new KeyValidityTime(DateTime.Now, new TimeDifference(1, 0, 0, 0)));
+            // manager.IssueAPIKey(Guid.NewGuid().ToString(), permissionsMap, new KeyValidityTime(DateTime.Now, new TimeDifference(1, 0, 0, 0)));
+
+            manager.RevokeAPIKey(args[0]);
         }
     }  
 }

@@ -31,8 +31,8 @@
             {
                 return new Table(tableName,
                     new Field[] {
-                         new Field("UserID", FieldType.Char, new Flag[] { Flag.PrimaryKey, Flag.NotNull }, 64),
                          new Field("Key", FieldType.Char, new Flag[] { Flag.NotNull }, 88),
+                         new Field("UserID", FieldType.Char, new Flag[] { Flag.PrimaryKey, Flag.NotNull }, 64),
                          new Field("Permissions", FieldType.VarChar, new Flag[]{}, 1024),
                          new Field("CreationTime", FieldType.VarChar, new Flag[] { Flag.NotNull}, 22),
                          new Field("ExpiryTime", FieldType.VarChar, new Flag[]{}, 22),
@@ -47,7 +47,14 @@
 
                 return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key.Key}\'", this.APIKeyTable).Length != 0);
             }
+    
+            public bool KeyExists(string key, bool dbCheck = false)
+            {
+                if (!dbCheck)
+                    return this.APIKeyMap.ContainsKey(key);
 
+                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key}\'", this.APIKeyTable).Length != 0);
+            }
 
             public void BackupKeys()
             {
@@ -85,21 +92,21 @@
             {
                 APIKey key = new APIKey(GeneralTools.GetRandomBase64(64), userID, permissionsMap, true);
                 
-                this.APIKeyMap.Add(key.Key, key);
+                this.
+                    APIKeyMap.Add(key.Key, key);
 
                 if (backUp)
                 {
                     Console.WriteLine(JsonConvert.SerializeObject(key.ToRecord()));
                     this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
                 }
-                
 
                 return key;
             }
 
             public APIKey IssueAPIKey(string userID, Dictionary<string, bool> permissionsMap, KeyValidityTime validityTime, bool backUp = true)
             {
-                APIKey key = new APIKey(Guid.NewGuid().ToString(), userID, permissionsMap, validityTime);
+                APIKey key = new APIKey(GeneralTools.GetRandomBase64(64), userID, permissionsMap, validityTime);
                 
                 this.APIKeyMap.Add(key.Key, key);
 
@@ -107,6 +114,18 @@
                     this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
 
                 return key;
+            }
+
+            public bool RevokeAPIKey(string key)
+            {
+                if (this.KeyExists(key, true))
+                {
+                    this.DBInstance.ExecuteQuery($"DELETE FROM {this.APIKeyTable} WHERE Key=\'{key}\'");
+                    
+                    return true;
+                }
+
+                return false;
             }
 
             public APIKeyManager(PostGRESDatabase dbInstance, string tableName = "APIKeys", bool load = false, bool autoBackup = false)

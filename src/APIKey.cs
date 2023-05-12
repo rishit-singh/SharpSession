@@ -32,15 +32,15 @@ namespace SharpSession
             try
             {
                 record = new Record(new string[] {
-                        "UserID",
                         "Key",
+                        "UserID",
                         "Permissions",
                         "CreationTime",
                         "ExpiryTime",
                         "IsLimitless"
                     }, new object[] {
-                        this.UserID,
                         this.Key,
+                        this.UserID,
                         Tools.KeyTools.GetPermissionsString(this.Permissions),
                         this.ValidityTime.CreationTime.ToString(),
                         (!this.IsLimitless) ? this.ValidityTime.ExpiryTime.ToString() : null,
@@ -55,8 +55,8 @@ namespace SharpSession
             return record;
         }
 
-        public bool GetIsExpired()
-        {
+        protected bool GetIsExpired()
+        {   
             if (this.IsLimitless)
                 return false;
 
