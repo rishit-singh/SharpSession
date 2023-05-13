@@ -48,7 +48,7 @@
                 return (this.KeyDB.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key.Key}\'", this.APIKeyTable).Length != 0);
             }
     
-            public bool KeyExists(string key, bool dbCheck = false)
+            public bool KeyExists(string key, bool dbCheck = true)
             {
                 if (!dbCheck)
                     return this.APIKeyMap.ContainsKey(key);

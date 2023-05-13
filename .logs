@@ -120,3 +120,12 @@ Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
 Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
 Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
 Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42601: INSERT has more expressions than target columns
+
+POSITION: 230
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;

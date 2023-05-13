@@ -24,11 +24,9 @@ namespace SharpSession
     {
         public string ID;
 
-        public string UserID;
-
         public APIKey SessionAPIKey;
 
-        public SessionStatus Status { get { return this.Status; } set { this.SetStatus(value); } }
+        public SessionStatus Status { get; set; }
 
         public static string[] SessionStatusStrings = new string[] {
             "LoggedIn",
@@ -40,13 +38,11 @@ namespace SharpSession
             return new Record(new string[] {
                     "SessionID",
                     "APIKey",
-                    "UserID",
                     "Status"
                 },
                 new object[] {
                     this.ID,
                     this.SessionAPIKey.Key,
-                    this.UserID,
                     (int)this.Status
                 });
         }
@@ -78,10 +74,9 @@ namespace SharpSession
             this.Status = SessionStatus.LoggedOut;
         }
 
-        public Session(string id, string userID, APIKey apiKey, SessionStatus status)
+        public Session(string id, APIKey apiKey, SessionStatus status)
         {
             this.ID = id;
-            this.UserID = userID;
             this.SessionAPIKey = apiKey;
             this.Status = status;
         }
@@ -110,20 +105,15 @@ namespace SharpSession
             if (!this.KeyManager.KeyExists(apiKey))
                 return null;
 
-            this.SessionDB.InsertRecord((session = new Session(Guid.NewGuid().ToString(), (key = this.KeyManager.GetAPIKey(apiKey)).UserID, key, SessionStatus.LoggedIn)).ToRecord(), this.SessionTable);
+            this.SessionDB.InsertRecord((session = new Session(Guid.NewGuid().ToString(), this.KeyManager.GetAPIKey(apiKey), SessionStatus.LoggedIn)).ToRecord(), this.SessionTable);
 
             return session;
         }
 
         public void AssertSessionTable()
         {
-            bool exists;
-            if (!(exists = this.SessionTableExists()))
-            {
+            if (!this.SessionTableExists())
                 this.SessionDB.ExecuteQuery(this.GetTableSchema().GetCreateQuery());
-                
-                Console.WriteLine($"Table exists: {exists}");
-            }
         }
 
         protected bool SessionTableExists()
@@ -136,7 +126,7 @@ namespace SharpSession
             return new Table(this.SessionTable, new Field[]
             {
                 new Field("SessionID", FieldType.Char, new  Flag[] { Flag.NotNull, Flag.PrimaryKey }, 64), 
-                new Field("UserID", FieldType.Char, new Flag[] { Flag.NotNull }, 64),
+                new Field("APIKey", FieldType.Char, new Flag[] { Flag.NotNull }, 88),
                 new Field("Status", FieldType.Int) 
             });
         }
@@ -149,7 +139,7 @@ namespace SharpSession
                 if (record.Values[2].ToString() == Session.SessionStatusStrings[x])
                     status = (SessionStatus)x;
                     
-            return new Session(record.Values[0].ToString(), record.Values[1].ToString(), this.KeyManager.GetAPIKey(record.Values[1].ToString()), status);
+            return new Session(record.Values[0].ToString(), this.KeyManager.GetAPIKey(record.Values[1].ToString()), status);
         } 
         
         public Session GetSessionByID(string id, bool checkDB = false)
