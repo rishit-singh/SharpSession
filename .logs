@@ -98,3 +98,23 @@ Can't cast database type boolean to String
 Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
 Can't cast database type boolean to String
 Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Connection is not open
+Connection is not open
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42P07: relation "sessions" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42P07: relation "sessions" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42P07: relation "sessions" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+42P07: relation "sessions" already exists
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;
+Host=localhost;Database=apikey;UserName=rishit;Password=tecsuskamboj93;

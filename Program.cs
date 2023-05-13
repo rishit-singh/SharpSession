@@ -23,19 +23,12 @@ namespace SharpSession
 
         public static void Main(string[] args)
         {
-            PostGRESDatabase database = new PostGRESDatabase(DatabaseConfiguration.LoadFromFile("DatabaseConfig.json"));
-            
-            database.Connect();
-            
-            APIKeyManager manager = new APIKeyManager(database);
-             
-            Dictionary<string, bool> permissionsMap = new Dictionary<string, bool>();
-            
-            permissionsMap.Add("Read", true);
-            
-            // manager.IssueAPIKey(Guid.NewGuid().ToString(), permissionsMap, new KeyValidityTime(DateTime.Now, new TimeDifference(1, 0, 0, 0)));
+            SessionManager manager = new SessionManager(DatabaseConfiguration.LoadFromFile("DatabaseConfig.json"));
 
-            manager.RevokeAPIKey(args[0]);
+            Session session;
+            
+            if ((session = manager.CreateSession("yd1ZEUOafBKGJO4fpeSu+R9RCAqkH3Vmt5iVzoLxON33pyhWQ890Px2+dVT0V5FfJSh36CIHy7PTrDFff7vpXQ==")) != null)
+                Console.WriteLine($"Session created: {session.ID}");
         }
     }  
 }

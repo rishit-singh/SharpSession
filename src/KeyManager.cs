@@ -16,7 +16,7 @@
         /// </summary>
         public class APIKeyManager
         {
-            public PostGRESDatabase DBInstance; // Database instance where the keys will be stored.
+            public PostGRESDatabase KeyDB; // Database instance where the keys will be stored.
 
             public Dictionary<string, APIKey> APIKeyMap;
 
@@ -45,7 +45,7 @@
                 if (!dbCheck)
                     return this.APIKeyMap.ContainsKey(key.Key);
 
-                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key.Key}\'", this.APIKeyTable).Length != 0);
+                return (this.KeyDB.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key.Key}\'", this.APIKeyTable).Length != 0);
             }
     
             public bool KeyExists(string key, bool dbCheck = false)
@@ -53,7 +53,12 @@
                 if (!dbCheck)
                     return this.APIKeyMap.ContainsKey(key);
 
-                return (this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key}\'", this.APIKeyTable).Length != 0);
+                return (this.KeyDB.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key}\'", this.APIKeyTable).Length != 0);
+            }
+
+            public APIKey GetAPIKey(string key)
+            {
+                return new APIKey(this.KeyDB.FetchQueryData($"SELECT * FROM {this.APIKeyTable} WHERE Key=\'{key}\'", this.APIKeyTable)[0]);
             }
 
             public void BackupKeys()
@@ -62,15 +67,15 @@
 
                 foreach (APIKey key in keys)
                     if (this.KeyExists(key, true))
-                        this.DBInstance.UpdateRecord(new Record(new string[] { "Key" }, new object[] { key.Key }),
+                        this.KeyDB.UpdateRecord(new Record(new string[] { "Key" }, new object[] { key.Key }),
                             key.ToRecord(), this.APIKeyTable);
                     else
-                        this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+                        this.KeyDB.InsertRecord(key.ToRecord(), this.APIKeyTable);
             }
             
             public void LoadKeys()
             {
-                Record[] keyRecords = this.DBInstance.FetchQueryData($"SELECT * FROM {this.APIKeyTable};", this.APIKeyTable);
+                Record[] keyRecords = this.KeyDB.FetchQueryData($"SELECT * FROM {this.APIKeyTable};", this.APIKeyTable);
 
                 APIKey temp;
                 
@@ -85,7 +90,7 @@
 
             protected bool KeyTableExists()
             {
-                return ((int)this.DBInstance.FetchQueryData("SELECT * FROM information_schema.tables WHERE table_name=\'apikeys\'", this.APIKeyTable).Length != 0);
+                return ((int)this.KeyDB.FetchQueryData("SELECT * FROM information_schema.tables WHERE table_name=\'apikeys\'", this.APIKeyTable).Length != 0);
             }
 
             public APIKey IssueAPIKey(string userID, Dictionary<string, bool> permissionsMap, bool backUp = true)
@@ -98,7 +103,7 @@
                 if (backUp)
                 {
                     Console.WriteLine(JsonConvert.SerializeObject(key.ToRecord()));
-                    this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+                    this.KeyDB.InsertRecord(key.ToRecord(), this.APIKeyTable);
                 }
 
                 return key;
@@ -111,7 +116,7 @@
                 this.APIKeyMap.Add(key.Key, key);
 
                 if (backUp)
-                    this.DBInstance.InsertRecord(key.ToRecord(), this.APIKeyTable);
+                    this.KeyDB.InsertRecord(key.ToRecord(), this.APIKeyTable);
 
                 return key;
             }
@@ -120,7 +125,7 @@
             {
                 if (this.KeyExists(key, true))
                 {
-                    this.DBInstance.ExecuteQuery($"DELETE FROM {this.APIKeyTable} WHERE Key=\'{key}\'");
+                    this.KeyDB.ExecuteQuery($"DELETE FROM {this.APIKeyTable} WHERE Key=\'{key}\'");
                     
                     return true;
                 }
@@ -130,14 +135,16 @@
 
             public APIKeyManager(PostGRESDatabase dbInstance, string tableName = "APIKeys", bool load = false, bool autoBackup = false)
             {
-                this.DBInstance = dbInstance;
+                this.KeyDB = dbInstance;
                 this.AutoBackup = autoBackup;
                 this.APIKeyTable = tableName;
                 
                 this.APIKeyMap = new Dictionary<string, APIKey>();
 
+                this.KeyDB.Connect();            
+                
                 if (!this.KeyTableExists())
-                    this.DBInstance.ExecuteQuery(APIKeyManager.GetTableSchema("APIKeys").GetCreateQuery());
+                    this.KeyDB.ExecuteQuery(APIKeyManager.GetTableSchema("APIKeys").GetCreateQuery());
                 
                 if (load) 
                     this.LoadKeys();
